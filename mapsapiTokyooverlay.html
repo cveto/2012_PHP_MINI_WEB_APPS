@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Ground Overlays</title>
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script>
+// This example uses a GroundOverlay to place an image on the map
+// showing an antique map of Newark, NJ.
+
+var historicalOverlay;
+var prozornost = 0.5;  //LOCAL variable but accesable in functions
+
+////////////////////Change opacity function..what buttons is pressed?
+function spremeni_prozornost(how_transparent) {
+	switch (how_transparent)
+		{
+		case 'hide_metro':
+			prozornost=0;
+			break;
+		case 'more_transparent':
+			prozornost-=0.1;
+			if (prozornost <=0) prozornost = 0;		//Min value should be 0
+			break;
+		case 'less_transparent':
+			prozornost+=0.1
+			if (prozornost >=1) prozornost = 1;		//Max value should be 1
+			break;
+		case 'show_metro':
+			prozornost=1;
+			break;
+		}
+
+		historicalOverlay .setOptions({opacity: prozornost});
+		
+//alert(prozornost);
+//alert(map.getZoom());
+}
+
+// MAP function
+function initialize() {
+
+  var newark = new google.maps.LatLng(35.68, 139.75);  //This just the central poin, starting position of maps
+  imageBounds = new google.maps.LatLngBounds(		//This sets bourders of the image
+      new google.maps.LatLng(35.6165, 139.6111),	// for japan: |Bottom side	| Right side|
+      new google.maps.LatLng(35.7624, 139.8575));   // for Japan: |Top side		| Left side	|
+  
+  //Overlay opaciti - wanna make a marker of this. Changed to GLOBAL variable
+  var overlayOpts = {
+      opacity:prozornost			
+  		}
+
+  var mapOptions = {
+    zoom: 12,
+    center: newark
+  };
+
+
+
+// Calling the actual map
+map = new google.maps.Map(document.getElementById('map-canvas'),  //made it a GLOBAL variable because need zoom information
+      mapOptions);
+
+
+historicalOverlay = new google.maps.GroundOverlay(
+      'http://www.fun-japan.com/images/traffic/Tokyo_metro_map_kai2.jpg',
+      //'images/Tokyo_metro.jpg',		//DIR
+      imageBounds, overlayOpts);
+  historicalOverlay.setMap(map);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </head>
+  <body>
+    <button onclick="spremeni_prozornost('hide_metro')"> Hide Metro lines </button>
+  	<button onclick="spremeni_prozornost('more_transparent')"> More transparent </button>
+    <button onclick="spremeni_prozornost('less_transparent')"> Less transparent </button>
+    <button onclick="spremeni_prozornost('show_metro')"> Show Metro Lines </button>
+    <div id="map-canvas"></div>
+  </body>
+</html>
